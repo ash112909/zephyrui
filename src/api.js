@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/v2';
+const API_BASE_URL = 'https://api.zephyrscale.smartbear.com/v2';
 const API_TOKEN = process.env.REACT_APP_API_TOKEN;
 
 const api = axios.create({
