@@ -1,12 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://api.zephyrscale.smartbear.com/v2';
-const API_TOKEN = process.env.REACT_APP_API_TOKEN;
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '/api', // This will be proxied by Netlify
   headers: {
-    'Authorization': `Bearer ${API_TOKEN}`,
     'Content-Type': 'application/json',
   },
 });
@@ -17,7 +13,7 @@ export const getTestCase = async (testCaseKey) => {
       api.get(`/testcases/${testCaseKey}`),
       api.get(`/testcases/${testCaseKey}/teststeps?maxResults=1000`)
     ]);
-    
+
     return {
       ...testCaseResponse.data,
       steps: testStepsResponse.data.values
@@ -54,5 +50,3 @@ export const updateTestExecutionSteps = async (testExecutionId, stepResults) => 
     throw new Error('Failed to update test execution steps due to server error');
   }
 };
-
-
