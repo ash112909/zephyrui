@@ -18,11 +18,12 @@ const TestCaseExecution = () => {
     setError('');
     try {
       const fetchedTestCase = await getTestCase(testCaseKey);
+      console.log(fetchedTestCase);  // Debug to view fetched data
       setTestCase(fetchedTestCase);
       if (fetchedTestCase.steps && fetchedTestCase.steps.length > 0) {
         setStepResults(fetchedTestCase.steps.map(step => ({
           status: '',
-          actualResult: '',
+          actualResult: '', // Initialize actualResult as empty
           description: step.description,
           testData: step.testData,
           expectedResult: step.expectedResult
@@ -34,8 +35,7 @@ const TestCaseExecution = () => {
       console.error('Error fetching test case:', error);
       setError('Error fetching test case. Please check the key and try again.');
     } finally {
-      setLoading(false);
-    }
+      setLoading...
   };
 
   const handleStepResult = (index, status) => {
@@ -63,7 +63,12 @@ const TestCaseExecution = () => {
       };
       const createdExecution = await createTestExecution(executionData);
 
-      await updateTestExecutionSteps(createdExecution.id, stepResults);
+      const stepResultsData = stepResults.map(result => ({
+        statusName: result.status,
+        actualResult: result.actualResult
+      }));
+
+      await updateTestExecutionSteps(createdExecution.id, stepResultsData);
 
       alert('Test execution created and steps updated successfully!');
     } catch (error) {
@@ -92,7 +97,7 @@ const TestCaseExecution = () => {
         <TextField label="Project Key" value={projectKey} onChange={e => setProjectKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Cycle Key" value={testCycleKey} onChange={e => setTestCycleKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Case Key" value={testCaseKey} onChange={e => setTestCaseKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
-        
+
         {loading ? <CircularProgress /> : (
           <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleFetchTestCase}>
             Fetch Test Case
@@ -102,7 +107,8 @@ const TestCaseExecution = () => {
         {error && <Typography color="error">{error}</Typography>}
 
         {testCase && testCase.steps.map((step, index) => (
-          <Card key={step.id} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
+          <Card key={step.id} variant="outlined" style
+={{ margin: '10px 0', padding: '10px' }}>
             <Typography>{step.description || `Step ${index + 1}`}</Typography>
             <Typography>Test Data: {step.testData}</Typography>
             <Typography>Expected Result: {step.expectedResult}</Typography>
@@ -114,9 +120,11 @@ const TestCaseExecution = () => {
               margin="normal"
               variant="outlined"
             />
-            <Button startIcon={<MenuIcon />}
-                    onClick={() => handleStepResult(index, stepResults[index].status === 'PASS' ? 'FAIL' : 'PASS')}
-                    color={stepResults[index].status === 'PASS' ? "primary" : "error"}>
+            <Button
+              startIcon={<MenuIcon />}
+              onClick={() => handleStepResult(index, stepResults[index].status === 'PASS' ? 'FAIL' : 'PASS')}
+              color={stepResults[index].status === 'PASS' ? "primary" : "error"}
+            >
               {stepResults[index].status || 'Set Result'}
             </Button>
           </Card>
@@ -126,13 +134,19 @@ const TestCaseExecution = () => {
           fullWidth
           label="Comments"
           value={comments}
-          onChange={e => setComments(e.target.value)}
+          onChange={(e) => setComments(e.target.value)}
           margin="normal"
           variant="outlined"
           multiline
           rows={4}
         />
-        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
+        <Button
+          startIcon={<MenuIcon />}
+          variant="contained"
+          color="primary"
+          onClick={handleCreateExecution}
+          disabled={!projectKey || !testCycleKey}
+        >
           Create Test Execution
         </Button>
       </Card>
