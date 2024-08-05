@@ -20,7 +20,7 @@ const TestCaseExecution = () => {
       const fetchedTestCase = await getTestCase(testCaseKey);
       setTestCase(fetchedTestCase);
       if (fetchedTestCase.steps && fetchedTestCase.steps.length > 0) {
-        setStepResults(fetchedTestCase.steps.map(() => ({ status: '' })));
+        setStepResults(fetchedTestCase.steps.map(() => ({ status: '', actualResult: '' })));
       } else {
         setError('Test case steps are not available. Please check the API response.');
       }
@@ -38,6 +38,12 @@ const TestCaseExecution = () => {
     setStepResults(newStepResults);
   };
 
+  const handleActualResultChange = (index, value) => {
+    const newStepResults = [...stepResults];
+    newStepResults[index].actualResult = value;
+    setStepResults(newStepResults);
+  };
+
   const handleCreateExecution = async () => {
     setError('');
     try {
@@ -50,14 +56,7 @@ const TestCaseExecution = () => {
         comment: comments,
       };
       const createdExecution = await createTestExecution(executionData);
-
-      const stepResultsData = stepResults.map((result, index) => ({
-        statusName: result.status,
-        actualResult: result.status === 'PASS' ? 'Step passed' : 'Step failed'
-      }));
-
-      await updateTestExecutionSteps(createdExecution.id, stepResultsData);
-
+      await updateTestExecutionSteps(createdExecution.id, stepResults);
       alert('Test execution created and steps updated successfully!');
     } catch (error) {
       console.error('Error creating test execution or updating steps:', error);
@@ -80,7 +79,6 @@ const TestCaseExecution = () => {
           </Box>
         </Toolbar>
       </AppBar>
-
       <Card variant="outlined" style={{ padding: 20, marginTop: 20 }}>
         <TextField label="Project Key" value={projectKey} onChange={e => setProjectKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Cycle Key" value={testCycleKey} onChange={e => setTestCycleKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
@@ -96,13 +94,21 @@ const TestCaseExecution = () => {
 
         {testCase && testCase.steps.map((step, index) => (
           <Card key={step.id} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
-            <Typography>{step.inline.description || `Step ${index + 1}`}</Typography>
-            <Typography>Test Data: {step.inline.testData}</Typography>
-            <Typography>Expected Result: {step.inline.expectedResult}</Typography>
+            <Typography>{step.description || `Step ${index + 1}`}</Typography>
+            <Typography>Test Data: {step.testData}</Typography>
+            <Typography>Expected Result: {step.expectedResult}</Typography>
+            <TextField
+              fullWidth
+              label="Actual Result"
+              value={stepResults[index].actualResult}
+              onChange={(e) => handleActualResultChange(index, e.target.value)}
+              margin="normal"
+              variant="outlined"
+            />
             <Button startIcon={<MenuIcon />}
-                    onClick={() => handleStepResult(index, stepResults[index]?.status === 'PASS' ? 'FAIL' : 'PASS')}
-                    color={stepResults[index]?.status === 'PASS' ? "primary" : "error"}>
-              {stepResults[index]?.status || 'Set Result'}
+                    onClick={() => handleStepResult(index, stepResults[index].status === 'PASS' ? 'FAIL' : 'PASS')}
+                    color={stepResults[index].status === 'PASS' ? "primary" : "error"}>
+              {stepResults[index].status || 'Set Result'}
             </Button>
           </Card>
         ))}
@@ -111,7 +117,7 @@ const TestCaseExecution = () => {
           fullWidth
           label="Comments"
           value={comments}
-          onChange={e => setComments(e.target.value)}
+          onChange={(e) => setComments(e.target.value)}
           margin="normal"
           variant="outlined"
           multiline
