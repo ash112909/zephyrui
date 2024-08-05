@@ -23,7 +23,7 @@ const TestCaseExecution = () => {
         setStepResults(fetchedTestCase.steps.map(step => ({
           status: '',
           actualResult: '',
-          description: step.description,
+          description: step.inline.description,
           testData: step.testData,
           expectedResult: step.expectedResult
         })));
@@ -63,12 +63,10 @@ const TestCaseExecution = () => {
       };
       const createdExecution = await createTestExecution(executionData);
 
-      const stepResultsData = stepResults.map(result => ({
+      await updateTestExecutionSteps(createdExecution.id, stepResults.map(result => ({
         statusName: result.status,
         actualResult: result.actualResult
-      }));
-
-      await updateTestExecutionSteps(createdExecution.id, stepResultsData);
+      })));
 
       alert('Test execution created and steps updated successfully!');
     } catch (error) {
@@ -107,8 +105,8 @@ const TestCaseExecution = () => {
         {error && <Typography color="error">{error}</Typography>}
 
         {testCase && testCase.steps.map((step, index) => (
-          <Card key={step.id} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
-            <div dangerouslySetInnerHTML={{ __html: step.description }} />
+          <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
+            <Typography>{step.inline.description || `Step ${index + 1}`}</Typography>
             <Typography>Test Data: {step.testData}</Typography>
             <Typography>Expected Result: {step.expectedResult}</Typography>
             <TextField
@@ -122,8 +120,7 @@ const TestCaseExecution = () => {
             <Button
               startIcon={<MenuIcon />}
               onClick={() => handleStepResult(index, stepResults[index].status === 'PASS' ? 'FAIL' : 'PASS')}
-              color={stepResults[index].status === 'PASS' ? "primary" : "error"}
-            >
+              color={stepResults[index].status === 'PASS' ? "primary" : "error"}>
               {stepResults[index].status || 'Set Result'}
             </Button>
           </Card>
@@ -139,13 +136,7 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-        <Button
-          startIcon={<MenuIcon />}
-          variant="contained"
-          color="primary"
-          onClick={handleCreateExecution}
-          disabled={!projectKey || !testCycleKey}
-        >
+        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
           Create Test Execution
         </Button>
       </Card>
