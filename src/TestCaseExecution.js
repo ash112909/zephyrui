@@ -23,7 +23,7 @@ const TestCaseExecution = () => {
         setStepResults(fetchedTestCase.steps.map(step => ({
           status: '',
           actualResult: '',
-          description: step.description,
+          description: step.inline.description,
           testData: step.testData,
           expectedResult: step.expectedResult
         })));
@@ -106,7 +106,7 @@ const TestCaseExecution = () => {
 
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
-            <Typography>{step.description || `Step ${index + 1}`}</Typography>
+            <Typography>{step.inline.description || `Step ${index + 1}`}</Typography>
             <Typography>Test Data: {step.testData}</Typography>
             <Typography>Expected Result: {step.expectedResult}</Typography>
             <TextField
