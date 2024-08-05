@@ -20,7 +20,13 @@ const TestCaseExecution = () => {
       const fetchedTestCase = await getTestCase(testCaseKey);
       setTestCase(fetchedTestCase);
       if (fetchedTestCase.steps && fetchedTestCase.steps.length > 0) {
-        setStepResults(fetchedTestCase.steps.map(() => ({ status: '', actualResult: '' })));
+        setStepResults(fetchedTestCase.steps.map(step => ({
+          status: '',
+          actualResult: '',
+          description: step.description,
+          testData: step.testData,
+          expectedResult: step.expectedResult
+        })));
       } else {
         setError('Test case steps are not available. Please check the API response.');
       }
@@ -56,7 +62,9 @@ const TestCaseExecution = () => {
         comment: comments,
       };
       const createdExecution = await createTestExecution(executionData);
+
       await updateTestExecutionSteps(createdExecution.id, stepResults);
+
       alert('Test execution created and steps updated successfully!');
     } catch (error) {
       console.error('Error creating test execution or updating steps:', error);
@@ -79,6 +87,7 @@ const TestCaseExecution = () => {
           </Box>
         </Toolbar>
       </AppBar>
+
       <Card variant="outlined" style={{ padding: 20, marginTop: 20 }}>
         <TextField label="Project Key" value={projectKey} onChange={e => setProjectKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Cycle Key" value={testCycleKey} onChange={e => setTestCycleKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
@@ -117,7 +126,7 @@ const TestCaseExecution = () => {
           fullWidth
           label="Comments"
           value={comments}
-          onChange={(e) => setComments(e.target.value)}
+          onChange={e => setComments(e.target.value)}
           margin="normal"
           variant="outlined"
           multiline
