@@ -23,8 +23,8 @@ exports.handler = async (event) => {
   } catch (error) {
     console.error('Error fetching data from Zephyr Scale API:', error);
     return {
-      statusCode: error.response.status,
-      body: JSON.stringify(error.response.data),
+      statusCode: error.response ? error.response.status : 500,
+      body: JSON.stringify(error.response ? error.response.data : { message: 'Internal Server Error' }),
     };
   }
 };
