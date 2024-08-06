@@ -106,9 +106,9 @@ const TestCaseExecution = () => {
 
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
-            <Typography>{step.inline.description || `Step ${index + 1}`}</Typography>
-            <Typography>Test Data: {step.inline.testData}</Typography>
-            <Typography>Expected Result: {step.inline.expectedResult}</Typography>
+            <div dangerouslySetInnerHTML={{ __html: step.description || `Step ${index + 1}` }} />
+            <Typography>Test Data: {step.testData}</Typography>
+            <Typography>Expected Result: {step.expectedResult}</Typography>
             <TextField
               fullWidth
               label="Actual Result"
@@ -136,7 +136,7 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
+        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey or !testCycleKey}>
           Create Test Execution
         </Button>
       </Card>
