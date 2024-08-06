@@ -82,7 +82,6 @@ const TestCaseExecution = () => {
       console.log('Final step results:', stepResults);
       console.log('Final overall status:', overallStatus);
       
-      // First, create the execution with the overall status
       const executionData = {
         projectKey,
         testCycleKey,
@@ -96,7 +95,6 @@ const TestCaseExecution = () => {
       const createdExecution = await createTestExecution(executionData);
       console.log('API response for creation:', JSON.stringify(createdExecution, null, 2));
 
-      // Then, update the steps
       const stepUpdatePayload = stepResults.map(result => ({
         statusName: result.status,
         actualResult: result.actualResult
@@ -104,7 +102,6 @@ const TestCaseExecution = () => {
       const updatedSteps = await updateTestExecutionSteps(createdExecution.id, stepUpdatePayload);
       console.log('API response for step update:', JSON.stringify(updatedSteps, null, 2));
 
-      // Finally, reinforce the overall status
       const finalStatusUpdate = await updateExecutionStatus(createdExecution.id, overallStatus);
       console.log('API response for final status update:', JSON.stringify(finalStatusUpdate, null, 2));
 
@@ -144,10 +141,127 @@ const TestCaseExecution = () => {
     );
   };
 
-  // ... (rest of the component remains the same)
-
   return (
-    // ... (JSX remains the same)
+    <Container maxWidth="lg">
+      <AppBar position="static" style={{ background: '#8B0000' }}>
+        <Toolbar>
+          <IconButton edge="start" color="inherit" aria-label="menu">
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+            Test Case Execution
+          </Typography>
+          <Box sx={{ flexGrow: 0 }}>
+            <img src="/boklogo.png" alt="BOK Financial Logo" style={{ height: '48px' }} />
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      <Card variant="outlined" style={{ padding: 20, marginTop: 20 }}>
+        <TextField label="Project Key" value={projectKey} onChange={e => setProjectKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
+        <TextField label="Test Cycle Key" value={testCycleKey} onChange={e => setTestCycleKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
+        <TextField label="Test Case Key" value={testCaseKey} onChange={e => setTestCaseKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
+
+        {loading ? <CircularProgress /> : (
+          <Button startIcon={<SearchIcon />} variant="contained" color="primary" onClick={handleFetchTestCase}>
+            Fetch Test Case
+          </Button>
+        )}
+
+        {error && <Typography color="error">{error}</Typography>}
+
+        {testCase && testCase.steps.map((step, index) => (
+          <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
+            <Typography variant="h6">Step {index + 1}</Typography>
+            <Typography><strong>Description:</strong></Typography>
+            {renderInlineContent(step.inline.description)}
+            <Typography><strong>Test Data:</strong></Typography>
+            {renderInlineContent(step.inline.testData)}
+            <Typography><strong>Expected Result:</strong></Typography>
+            {renderInlineContent(step.inline.expectedResult)}
+            <TextField
+              fullWidth
+              label="Actual Result"
+              value={stepResults[index].actualResult}
+              onChange={(e) => handleActualResultChange(index, e.target.value)}
+              margin="normal"
+              variant="outlined"
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+              <Button
+                variant={stepResults[index].status === 'PASS' ? 'contained' : 'outlined'}
+                color="success"
+                onClick={() => handleStepResult(index, 'PASS')}
+              >
+                Pass
+              </Button>
+              <Button
+                variant={stepResults[index].status === 'FAIL' ? 'contained' : 'outlined'}
+                color="error"
+                onClick={() => handleStepResult(index, 'FAIL')}
+              >
+                Fail
+              </Button>
+              <Button
+                variant={stepResults[index].status === 'BLOCKED' ? 'contained' : 'outlined'}
+                color="warning"
+                onClick={() => handleStepResult(index, 'BLOCKED')}
+              >
+                Blocked
+              </Button>
+            </Box>
+          </Card>
+        ))}
+
+        <Typography variant="h6" style={{ marginTop: '20px' }}>
+          Overall Status: {overallStatus}
+        </Typography>
+
+        <TextField
+          fullWidth
+          label="Comments"
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          margin="normal"
+          variant="outlined"
+          multiline
+          rows={4}
+        />
+
+        <Button 
+          startIcon={<PlayArrowIcon />} 
+          variant="contained" 
+          color="primary" 
+          onClick={handleCreateExecution} 
+          disabled={!projectKey || !testCycleKey}
+          style={{ marginTop: '20px' }}
+        >
+          Create Test Execution
+        </Button>
+      </Card>
+
+      <Modal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        closeAfterTransition
+      >
+        <Fade in={modalOpen}>
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '80%',
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4,
+          }}>
+            <img src={enlargedImageUrl} alt="Enlarged view" style={{ width: '100%', height: 'auto' }} />
+          </Box>
+        </Fade>
+      </Modal>
+    </Container>
   );
 };
 
