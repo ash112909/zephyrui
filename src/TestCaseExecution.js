@@ -43,16 +43,25 @@ const TestCaseExecution = () => {
     setModalOpen(false);
   };
 
-  const renderContent = (content) => (
-    <div>
-      <div dangerouslySetInnerHTML={{ __html: content }} />
-      {content.includes('<img') && (
-        <IconButton onClick={() => handleOpenModal(content.match(/src="([^"]*)"/)[1])}>
-          <ZoomInIcon />
-        </IconButton>
-      )}
-    </div>
-  );
+  const renderInlineContent = (content) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    const images = doc.getElementsByTagName('img');
+    
+    return (
+      <Box sx={{ position: 'relative', display: 'inline-block' }}>
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+        {images.length > 0 && (
+          <IconButton 
+            onClick={() => handleOpenModal(images[0].src)}
+            sx={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,255,255,0.7)' }}
+          >
+            <ZoomInIcon />
+          </IconButton>
+        )}
+      </Box>
+    );
+  };
 
   return (
     <Container maxWidth="lg">
@@ -67,11 +76,11 @@ const TestCaseExecution = () => {
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
             <Typography variant="h6">Step {index + 1}</Typography>
             <Typography><strong>Description:</strong></Typography>
-            <div dangerouslySetInnerHTML={{ __html: step.description }} />
+            {renderInlineContent(step.inline.description)}
             <Typography><strong>Test Data:</strong></Typography>
-            {renderContent(step.testData)}
+            {renderInlineContent(step.inline.testData)}
             <Typography><strong>Expected Result:</strong></Typography>
-            {renderContent(step.expectedResult)}
+            {renderInlineContent(step.inline.expectedResult)}
             <TextField
               fullWidth
               label="Actual Result"
