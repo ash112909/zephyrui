@@ -20,6 +20,7 @@ const TestCaseExecution = () => {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [enlargedImageUrl, setEnlargedImageUrl] = useState('');
+  const [overallStatus, setOverallStatus] = useState('UNEXECUTED');
 
   const handleFetchTestCase = async () => {
     setLoading(true);
@@ -50,7 +51,13 @@ const TestCaseExecution = () => {
     setStepResults(prevResults => {
       const newResults = [...prevResults];
       newResults[index] = { ...newResults[index], status };
-      console.log('Updated step results:', newResults); // For debugging
+      console.log('Updated step results:', newResults);
+      
+      // Determine and set overall status immediately
+      const newOverallStatus = determineOverallStatus(newResults);
+      setOverallStatus(newOverallStatus);
+      console.log('New overall status:', newOverallStatus);
+      
       return newResults;
     });
   };
@@ -61,24 +68,37 @@ const TestCaseExecution = () => {
     setStepResults(newStepResults);
   };
 
+  const determineOverallStatus = (results) => {
+    const statusCounts = results.reduce((counts, step) => {
+      counts[step.status] = (counts[step.status] || 0) + 1;
+      return counts;
+    }, {});
+
+    console.log('Status counts:', statusCounts);
+
+    if (statusCounts['BLOCKED'] > 0) return 'BLOCKED';
+    if (statusCounts['FAIL'] > 0) return 'FAIL';
+    if (statusCounts['PASS'] === results.length) return 'PASS';
+    return 'UNEXECUTED';
+  };
+
   const handleCreateExecution = async () => {
     setError('');
     try {
-      console.log('Final step results:', stepResults); // For debugging
-      const status = determineOverallStatus(stepResults);
-      console.log('Determined overall status:', status); // For debugging
+      console.log('Final step results:', stepResults);
+      console.log('Final overall status:', overallStatus);
+      
       const executionData = {
         projectKey,
         testCycleKey,
         testCaseKey,
-        statusName: status,
+        statusName: overallStatus,
         comment: comments,
       };
       
       console.log('Execution payload:', JSON.stringify(executionData, null, 2));
       
       const createdExecution = await createTestExecution(executionData);
-
       console.log('API response:', JSON.stringify(createdExecution, null, 2));
 
       await updateTestExecutionSteps(createdExecution.id, stepResults.map(result => ({
@@ -91,17 +111,6 @@ const TestCaseExecution = () => {
       console.error('Error creating test execution or updating steps:', error);
       setError('Error in test execution process. Please try again.');
     }
-  };
-
-  const determineOverallStatus = (results) => {
-    const hasBlocked = results.some(step => step.status === 'BLOCKED');
-    const hasFail = results.some(step => step.status === 'FAIL');
-    const allPass = results.every(step => step.status === 'PASS');
-  
-    if (hasFail) return 'FAIL';
-    if (allPass) return 'PASS';
-    if (hasBlocked) return 'BLOCKED';
-    return 'UNEXECUTED'; // Default status if not all steps have been executed
   };
 
   const handleOpenModal = (imageUrl) => {
@@ -204,6 +213,10 @@ const TestCaseExecution = () => {
             </Box>
           </Card>
         ))}
+
+        <Typography variant="h6" style={{ marginTop: '20px' }}>
+          Overall Status: {overallStatus}
+        </Typography>
 
         <TextField
           fullWidth
