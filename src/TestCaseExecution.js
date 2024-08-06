@@ -24,8 +24,8 @@ const TestCaseExecution = () => {
           status: '',
           actualResult: '',
           description: step.inline.description,
-          testData: step.testData,
-          expectedResult: step.expectedResult
+          testData: step.inline.testData,
+          expectedResult: step.inline.expectedResult
         })));
       } else {
         setError('Test case steps are not available. Please check the API response.');
@@ -107,8 +107,8 @@ const TestCaseExecution = () => {
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
             <Typography>{step.inline.description || `Step ${index + 1}`}</Typography>
-            <Typography>Test Data: {step.testData}</Typography>
-            <Typography>Expected Result: {step.expectedResult}</Typography>
+            <Typography>Test Data: {step.inline.testData}</Typography>
+            <Typography>Expected Result: {step.inline.expectedResult}</Typography>
             <TextField
               fullWidth
               label="Actual Result"
