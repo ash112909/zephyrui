@@ -47,9 +47,12 @@ const TestCaseExecution = () => {
   };
 
   const handleStepResult = (index, status) => {
-    const newStepResults = [...stepResults];
-    newStepResults[index].status = status;
-    setStepResults(newStepResults);
+    setStepResults(prevResults => {
+      const newResults = [...prevResults];
+      newResults[index] = { ...newResults[index], status };
+      console.log('Updated step results:', newResults); // For debugging
+      return newResults;
+    });
   };
 
   const handleActualResultChange = (index, value) => {
@@ -61,7 +64,9 @@ const TestCaseExecution = () => {
   const handleCreateExecution = async () => {
     setError('');
     try {
+      console.log('Final step results:', stepResults); // For debugging
       const status = determineOverallStatus(stepResults);
+      console.log('Determined overall status:', status); // For debugging
       const executionData = {
         projectKey,
         testCycleKey,
@@ -69,7 +74,12 @@ const TestCaseExecution = () => {
         statusName: status,
         comment: comments,
       };
+      
+      console.log('Execution payload:', JSON.stringify(executionData, null, 2));
+      
       const createdExecution = await createTestExecution(executionData);
+
+      console.log('API response:', JSON.stringify(createdExecution, null, 2));
 
       await updateTestExecutionSteps(createdExecution.id, stepResults.map(result => ({
         statusName: result.status,
@@ -84,9 +94,9 @@ const TestCaseExecution = () => {
   };
 
   const determineOverallStatus = (results) => {
-    if (results.some(step => step.status === 'Blocked')) return 'Blocked';
-    if (results.some(step => step.status === 'Fail')) return 'Fail';
-    if (results.every(step => step.status === 'Pass')) return 'Pass';
+    if (results.some(step => step.status === 'BLOCKED')) return 'BLOCKED';
+    if (results.some(step => step.status === 'FAIL')) return 'FAIL';
+    if (results.every(step => step.status === 'PASS')) return 'PASS';
     return 'UNEXECUTED'; // Default status if not all steps have been executed
   };
 
@@ -167,23 +177,23 @@ const TestCaseExecution = () => {
             />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
               <Button
-                variant={stepResults[index].status === 'Pass' ? 'contained' : 'outlined'}
+                variant={stepResults[index].status === 'PASS' ? 'contained' : 'outlined'}
                 color="success"
-                onClick={() => handleStepResult(index, 'Pass')}
+                onClick={() => handleStepResult(index, 'PASS')}
               >
                 Pass
               </Button>
               <Button
-                variant={stepResults[index].status === 'Fail' ? 'contained' : 'outlined'}
+                variant={stepResults[index].status === 'FAIL' ? 'contained' : 'outlined'}
                 color="error"
-                onClick={() => handleStepResult(index, 'Fail')}
+                onClick={() => handleStepResult(index, 'FAIL')}
               >
                 Fail
               </Button>
               <Button
-                variant={stepResults[index].status === 'Blocked' ? 'contained' : 'outlined'}
+                variant={stepResults[index].status === 'BLOCKED' ? 'contained' : 'outlined'}
                 color="warning"
-                onClick={() => handleStepResult(index, 'Blocked')}
+                onClick={() => handleStepResult(index, 'BLOCKED')}
               >
                 Blocked
               </Button>
