@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import {
   Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, 
-  IconButton, Box, Modal, Fade, List, ListItem, ListItemText, ListItemSecondaryAction
+  IconButton, Box, Modal, Fade
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { getTestCase, createTestExecution, updateTestExecutionSteps, uploadAttachments } from './api';
+import { getTestCase, createTestExecution, updateTestExecutionSteps } from './api';
 
 const TestCaseExecution = () => {
   const [testCaseKey, setTestCaseKey] = useState('');
@@ -21,7 +20,6 @@ const TestCaseExecution = () => {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [enlargedImageUrl, setEnlargedImageUrl] = useState('');
-  const [attachments, setAttachments] = useState([]);
 
   const handleFetchTestCase = async () => {
     setLoading(true);
@@ -78,19 +76,9 @@ const TestCaseExecution = () => {
         actualResult: result.actualResult
       })));
 
-      // Upload attachments
-      if (attachments.length > 0) {
-        const formData = new FormData();
-        attachments.forEach((file) => {
-          formData.append('file', file);  // Changed from 'file${index}' to 'file'
-        });
-        await uploadAttachments(createdExecution.id, formData);
-      }
-
-      alert('Test execution created, steps updated, and attachments uploaded successfully!');
-      setAttachments([]); // Clear attachments after successful upload
+      alert('Test execution created and steps updated successfully!');
     } catch (error) {
-      console.error('Error creating test execution, updating steps, or uploading attachments:', error);
+      console.error('Error creating test execution or updating steps:', error);
       setError('Error in test execution process. Please try again.');
     }
   };
@@ -102,14 +90,6 @@ const TestCaseExecution = () => {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-  };
-
-  const handleFileChange = (event) => {
-    setAttachments([...attachments, ...event.target.files]);
-  };
-
-  const handleRemoveFile = (index) => {
-    setAttachments(attachments.filter((_, i) => i !== index));
   };
 
   const renderInlineContent = (content) => {
@@ -197,37 +177,6 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-
-        {/* File upload section */}
-        <Box mt={2}>
-          <input
-            accept="image/*,application/pdf"
-            style={{ display: 'none' }}
-            id="raised-button-file"
-            multiple
-            type="file"
-            onChange={handleFileChange}
-          />
-          <label htmlFor="raised-button-file">
-            <Button variant="contained" component="span">
-              Upload Attachments
-            </Button>
-          </label>
-          {attachments.length > 0 && (
-            <List>
-              {attachments.map((file, index) => (
-                <ListItem key={index}>
-                  <ListItemText primary={file.name} />
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveFile(index)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
-          )}
-        </Box>
 
         <Button 
           startIcon={<PlayArrowIcon />} 
