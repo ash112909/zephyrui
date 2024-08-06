@@ -108,10 +108,12 @@ const TestCaseExecution = () => {
 
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
+            <Typography variant="h6">Step {index + 1}</Typography>
+            <Typography><strong>Description:</strong></Typography>
             <div dangerouslySetInnerHTML={{ __html: step.description }} />
-            <Typography>Test Data:</Typography>
+            <Typography><strong>Test Data:</strong></Typography>
             <div dangerouslySetInnerHTML={{ __html: step.testData }} />
-            <Typography>Expected Result:</Typography>
+            <Typography><strong>Expected Result:</strong></Typography>
             <div dangerouslySetInnerHTML={{ __html: step.expectedResult }} />
             <TextField
               fullWidth
