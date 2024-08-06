@@ -13,7 +13,6 @@ export const getTestCase = async (testCaseKey) => {
       api.get(`/testcases/${testCaseKey}`),
       api.get(`/testcases/${testCaseKey}/teststeps?maxResults=1000`)
     ]);
-
     return {
       ...testCaseResponse.data,
       steps: testStepsResponse.data.values
@@ -37,16 +36,25 @@ export const createTestExecution = async (executionData) => {
 export const updateTestExecutionSteps = async (testExecutionId, stepResults) => {
   try {
     const payload = {
-      steps: stepResults.map(step => ({
-        statusName: step.statusName,
-        actualResult: step.actualResult
-      })),
+      steps: stepResults,
     };
-
     const response = await api.put(`/testexecutions/${testExecutionId}/teststeps`, payload);
     return response.data;
   } catch (error) {
     console.error('Error updating test execution steps:', error);
     throw new Error('Failed to update test execution steps due to server error');
+  }
+};
+
+export const updateExecutionStatus = async (testExecutionId, status) => {
+  try {
+    const payload = {
+      status: status
+    };
+    const response = await api.put(`/testexecutions/${testExecutionId}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating test execution status:', error);
+    throw new Error('Failed to update test execution status due to server error');
   }
 };
