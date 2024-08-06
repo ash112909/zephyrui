@@ -23,9 +23,9 @@ const TestCaseExecution = () => {
         setStepResults(fetchedTestCase.steps.map(step => ({
           status: '',
           actualResult: '',
-          description: step.inline.description,
-          testData: step.inline.testData,
-          expectedResult: step.inline.expectedResult
+          description: step.description, // Assuming description contains HTML
+          testData: step.testData, // Assuming testData contains HTML
+          expectedResult: step.expectedResult // Assuming expectedResult contains HTML
         })));
       } else {
         setError('Test case steps are not available. Please check the API response.');
@@ -91,7 +91,7 @@ const TestCaseExecution = () => {
         </Toolbar>
       </AppBar>
 
-      <Card variant="outlined" style={{ padding: 20, marginTop: 20 }}>
+      <Card variant="outlined" style={{ padding: 20, marginTop 20 }}>
         <TextField label="Project Key" value={projectKey} onChange={e => setProjectKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Cycle Key" value={testCycleKey} onChange={e => setTestCycleKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Case Key" value={testCaseKey} onChange={e => setTestCaseKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
@@ -106,9 +106,11 @@ const TestCaseExecution = () => {
 
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
-            <div dangerouslySetInnerHTML={{ __html: step.description || `Step ${index + 1}` }} />
-            <Typography>Test Data: {step.testData}</Typography>
-            <Typography>Expected Result: {step.expectedResult}</Typography>
+            <div dangerouslySetInnerHTML={{ __html: step.description }} />
+            <Typography>Test Data:</Typography>
+            <div dangerouslySetInnerHTML={{ __html: step.testData }} />
+            <Typography>Expected Result:</Typography>
+            <div dangerouslySetInnerHTML={{ __html: step.expectedResult }} />
             <TextField
               fullWidth
               label="Actual Result"
