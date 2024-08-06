@@ -24,6 +24,17 @@ export const getTestCase = async (testCaseKey) => {
   }
 };
 
+export const uploadAttachments = async (executionId, formData) => {
+  const response = await fetch(`/api/testexecutions/${executionId}/attachments`, {
+    method: 'POST',
+    body: formData, // This should already be a FormData object
+  });
+  if (!response.ok) {
+    throw new Error('Failed to upload attachments');
+  }
+  return response.json();
+};
+
 export const createTestExecution = async (executionData) => {
   try {
     const response = await api.post('/testexecutions', executionData);
