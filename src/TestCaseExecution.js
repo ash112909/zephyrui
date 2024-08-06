@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, IconButton, Box, Modal, Fade } from '@mui/material';
+import {
+  Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, 
+  IconButton, Box, Modal, Fade
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -58,7 +61,7 @@ const TestCaseExecution = () => {
   const handleCreateExecution = async () => {
     setError('');
     try {
-      const status = stepResults.some(step => step.status === 'FAIL') ? 'FAIL' : (stepResults.some(step => step.status === 'BLOCKED') ? 'BLOCKED' : 'PASS');
+      const status = determineOverallStatus(stepResults);
       const executionData = {
         projectKey,
         testCycleKey,
@@ -76,8 +79,15 @@ const TestCaseExecution = () => {
       alert('Test execution created and steps updated successfully!');
     } catch (error) {
       console.error('Error creating test execution or updating steps:', error);
-      setError('Error creating test execution or updating steps. Please try again.');
+      setError('Error in test execution process. Please try again.');
     }
+  };
+
+  const determineOverallStatus = (results) => {
+    if (results.some(step => step.status === 'BLOCKED')) return 'BLOCKED';
+    if (results.some(step => step.status === 'FAIL')) return 'FAIL';
+    if (results.every(step => step.status === 'PASS')) return 'PASS';
+    return 'UNEXECUTED'; // Default status if not all steps have been executed
   };
 
   const handleOpenModal = (imageUrl) => {
@@ -87,6 +97,26 @@ const TestCaseExecution = () => {
 
   const handleCloseModal = () => {
     setModalOpen(false);
+  };
+
+  const renderInlineContent = (content) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    const images = doc.getElementsByTagName('img');
+    
+    return (
+      <Box sx={{ position: 'relative', display: 'inline-block' }}>
+        <div dangerouslySetInnerHTML={{ __html: content }} />
+        {images.length > 0 && (
+          <IconButton 
+            onClick={() => handleOpenModal(images[0].src)}
+            sx={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,255,255,0.7)' }}
+          >
+            <ZoomInIcon />
+          </IconButton>
+        )}
+      </Box>
+    );
   };
 
   return (
@@ -121,9 +151,12 @@ const TestCaseExecution = () => {
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
             <Typography variant="h6">Step {index + 1}</Typography>
-            <Typography><strong>Description:</strong> {step.inline.description}</Typography>
-            <Typography><strong>Test Data:</strong> {step.inline.testData}</Typography>
-            <Typography><strong>Expected Result:</strong> {step.inline.expectedResult}</Typography>
+            <Typography><strong>Description:</strong></Typography>
+            {renderInlineContent(step.inline.description)}
+            <Typography><strong>Test Data:</strong></Typography>
+            {renderInlineContent(step.inline.testData)}
+            <Typography><strong>Expected Result:</strong></Typography>
+            {renderInlineContent(step.inline.expectedResult)}
             <TextField
               fullWidth
               label="Actual Result"
@@ -132,15 +165,29 @@ const TestCaseExecution = () => {
               margin="normal"
               variant="outlined"
             />
-            <Button startIcon={<MenuIcon />} onClick={() => handleStepResult(index, 'PASS')} color={stepResults[index].status === 'PASS' ? 'primary' : 'default'}>
-              Pass
-            </Button>
-            <Button startIcon={<MenuIcon />} onClick={() => handleStepResult(index, 'FAIL')} color={stepResults[index].status === 'FAIL' ? 'error' : 'default'}>
-              Fail
-            </Button>
-            <Button startIcon={<MenuIcon />} onClick={() => handleStepResult(index, 'BLOCKED')} color={stepResults[index].status === 'BLOCKED' ? 'secondary' : 'default'}>
-              Blocked
-            </Button>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+              <Button
+                variant={stepResults[index].status === 'PASS' ? 'contained' : 'outlined'}
+                color="success"
+                onClick={() => handleStepResult(index, 'PASS')}
+              >
+                Pass
+              </Button>
+              <Button
+                variant={stepResults[index].status === 'FAIL' ? 'contained' : 'outlined'}
+                color="error"
+                onClick={() => handleStepResult(index, 'FAIL')}
+              >
+                Fail
+              </Button>
+              <Button
+                variant={stepResults[index].status === 'BLOCKED' ? 'contained' : 'outlined'}
+                color="warning"
+                onClick={() => handleStepResult(index, 'BLOCKED')}
+              >
+                Blocked
+              </Button>
+            </Box>
           </Card>
         ))}
 
@@ -154,7 +201,15 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-        <Button startIcon={<PlayArrowIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
+
+        <Button 
+          startIcon={<PlayArrowIcon />} 
+          variant="contained" 
+          color="primary" 
+          onClick={handleCreateExecution} 
+          disabled={!projectKey || !testCycleKey}
+          style={{ marginTop: '20px' }}
+        >
           Create Test Execution
         </Button>
       </Card>
