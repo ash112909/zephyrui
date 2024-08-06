@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, 
-  IconButton, Box, Modal, Fade
-} from '@mui/material';
+import { Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, IconButton, Box, Modal, Fade } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -61,7 +58,7 @@ const TestCaseExecution = () => {
   const handleCreateExecution = async () => {
     setError('');
     try {
-      const status = stepResults.some(step => step.status === 'FAIL') ? 'FAIL' : 'PASS';
+      const status = stepResults.some(step => step.status === 'FAIL') ? 'FAIL' : (stepResults.some(step => step.status === 'BLOCKED') ? 'BLOCKED' : 'PASS');
       const executionData = {
         projectKey,
         testCycleKey,
@@ -77,9 +74,9 @@ const TestCaseExecution = () => {
       })));
 
       alert('Test execution created and steps updated successfully!');
-    } catch (error) {
+    } catch ( error) {
       console.error('Error creating test execution or updating steps:', error);
-      setError('Error in test execution process. Please try again.');
+      setError('Error creating test execution or updating steps. Please try again.');
     }
   };
 
@@ -144,12 +141,9 @@ const TestCaseExecution = () => {
         {testCase && testCase.steps.map((step, index) => (
           <Card key={index} variant="outlined" style={{ margin: '10px 0', padding: '10px' }}>
             <Typography variant="h6">Step {index + 1}</Typography>
-            <Typography><strong>Description:</strong></Typography>
-            {renderInlineContent(step.inline.description)}
-            <Typography><strong>Test Data:</strong></Typography>
-            {renderInlineContent(step.inline.testData)}
-            <Typography><strong>Expected Result:</strong></Typography>
-            {renderInlineContent(step.inline.expectedResult)}
+            <Typography><strong>Description:</strong> {step.inline.description}</Typography>
+            <Typography><strong>Test Data:</strong> {step.inline.testData}</Typography>
+            <Typography><strong>Expected Result:</strong> {step.inline.expectedResult}</Typography>
             <TextField
               fullWidth
               label="Actual Result"
@@ -158,11 +152,14 @@ const TestCaseExecution = () => {
               margin="normal"
               variant="outlined"
             />
-            <Button
-              startIcon={<MenuIcon />}
-              onClick={() => handleStepResult(index, stepResults[index].status === 'PASS' ? 'FAIL' : 'PASS')}
-              color={stepResults[index].status === 'PASS' ? 'primary' : 'error'}>
-              {stepResults[index].status || 'Set Result'}
+            <Button startIcon={<MenuIcon />} onClick={() => handleStepResult(index, 'PASS')} color={stepResults[index].status === 'PASS' ? 'primary' : 'default'}>
+              Pass
+            </Button>
+            <Button startIcon={<MenuIcon />} onClick={() => handleStepResult(index, 'FAIL')} color={stepResults[index].status === 'FAIL' ? 'error' : 'default'}>
+              Fail
+            </Button>
+            <Button startIcon={<MenuIcon />} onClick={() => handleStepResult(index, 'BLOCKED')} color={stepResults[index].status === 'BLOCKED' ? 'secondary' : 'default'}>
+              Blocked
             </Button>
           </Card>
         ))}
@@ -177,15 +174,7 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-
-        <Button 
-          startIcon={<PlayArrowIcon />} 
-          variant="contained" 
-          color="primary" 
-          onClick={handleCreateExecution} 
-          disabled={!projectKey || !testCycleKey}
-          style={{ marginTop: '20px' }}
-        >
+        <Button startIcon={<PlayArrowIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
           Create Test Execution
         </Button>
       </Card>
