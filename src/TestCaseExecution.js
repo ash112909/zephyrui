@@ -74,7 +74,7 @@ const TestCaseExecution = () => {
       })));
 
       alert('Test execution created and steps updated successfully!');
-    } catch ( error) {
+    } catch (error) {
       console.error('Error creating test execution or updating steps:', error);
       setError('Error creating test execution or updating steps. Please try again.');
     }
@@ -87,26 +87,6 @@ const TestCaseExecution = () => {
 
   const handleCloseModal = () => {
     setModalOpen(false);
-  };
-
-  const renderInlineContent = (content) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
-    const images = doc.getElementsByTagName('img');
-    
-    return (
-      <Box sx={{ position: 'relative', display: 'inline-block' }}>
-        <div dangerouslySetInnerHTML={{ __html: content }} />
-        {images.length > 0 && (
-          <IconButton 
-            onClick={() => handleOpenModal(images[0].src)}
-            sx={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,255,255,0.7)' }}
-          >
-            <ZoomInIcon />
-          </IconButton>
-        )}
-      </Box>
-    );
   };
 
   return (
