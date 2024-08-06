@@ -1,10 +1,21 @@
 import axios from 'axios';
 
+// Create an instance of axios with predefined base settings
 const api = axios.create({
-  baseURL: '/api', // This will be proxied by Netlify
+  baseURL: '/api', // Adjust this according to your server configuration
   headers: {
     'Content-Type': 'application/json',
-  },
+    'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}` // Using environment variable for security
+  }
+});
+
+// Request interceptor to log and handle requests uniformly
+api.interceptors.request.use(request => {
+    console.log('Starting Request', JSON.stringify(request, null, 2))
+    return request;
+}, error => {
+    console.error('Request error:', error);
+    return Promise.reject(error);
 });
 
 export const getTestCase = async (testCaseKey) => {
