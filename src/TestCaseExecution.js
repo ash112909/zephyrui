@@ -138,7 +138,7 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey or !testCycleKey}>
+        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
           Create Test Execution
         </Button>
       </Card>
