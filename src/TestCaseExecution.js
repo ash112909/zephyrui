@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, IconButton, Box } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { getTestCase, createTestExecution, updateTestExecutionSteps } from './api';
 
 const TestCaseExecution = () => {
@@ -23,9 +25,9 @@ const TestCaseExecution = () => {
         setStepResults(fetchedTestCase.steps.map(step => ({
           status: '',
           actualResult: '',
-          description: step.description, // Assuming description contains HTML
-          testData: step.testData, // Assuming testData contains HTML
-          expectedResult: step.expectedResult // Assuming expectedResult contains HTML
+          description: step.description,
+          testData: step.testData,
+          expectedResult: step.expectedResult
         })));
       } else {
         setError('Test case steps are not available. Please check the API response.');
@@ -91,13 +93,13 @@ const TestCaseExecution = () => {
         </Toolbar>
       </AppBar>
 
-      <Card variant="outlined" style={{ padding: 20, marginTop 20 }}>
+      <Card variant="outlined" style={{ padding: 20, marginTop: 20 }}>
         <TextField label="Project Key" value={projectKey} onChange={e => setProjectKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Cycle Key" value={testCycleKey} onChange={e => setTestCycleKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
         <TextField label="Test Case Key" value={testCaseKey} onChange={e => setTestCaseKey(e.target.value)} fullWidth margin="normal" variant="outlined" />
 
         {loading ? <CircularProgress /> : (
-          <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleFetchTestCase}>
+          <Button startIcon={<SearchIcon />} variant="contained" color="primary" onClick={handleFetchTestCase}>
             Fetch Test Case
           </Button>
         )}
@@ -122,7 +124,7 @@ const TestCaseExecution = () => {
             <Button
               startIcon={<MenuIcon />}
               onClick={() => handleStepResult(index, stepResults[index].status === 'PASS' ? 'FAIL' : 'PASS')}
-              color={stepResults[index].status === 'PASS' ? "primary" : "error"}>
+              color={stepResults[index].status === 'PASS' ? 'primary' : 'error'}>
               {stepResults[index].status || 'Set Result'}
             </Button>
           </Card>
@@ -138,7 +140,7 @@ const TestCaseExecution = () => {
           multiline
           rows={4}
         />
-        <Button startIcon={<MenuIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
+        <Button startIcon={<PlayArrowIcon />} variant="contained" color="primary" onClick={handleCreateExecution} disabled={!projectKey || !testCycleKey}>
           Create Test Execution
         </Button>
       </Card>
