@@ -84,9 +84,9 @@ const TestCaseExecution = () => {
   };
 
   const determineOverallStatus = (results) => {
-    if (results.some(step => step.status === 'BLOCKED')) return 'BLOCKED';
-    if (results.some(step => step.status === 'FAIL')) return 'FAIL';
-    if (results.every(step => step.status === 'PASS')) return 'PASS';
+    if (results.some(step => step.status === 'Blocked')) return 'Blocked';
+    if (results.some(step => step.status === 'Fail')) return 'Fail';
+    if (results.every(step => step.status === 'Pass')) return 'Pass';
     return 'UNEXECUTED'; // Default status if not all steps have been executed
   };
 
@@ -167,23 +167,23 @@ const TestCaseExecution = () => {
             />
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
               <Button
-                variant={stepResults[index].status === 'PASS' ? 'contained' : 'outlined'}
+                variant={stepResults[index].status === 'Pass' ? 'contained' : 'outlined'}
                 color="success"
-                onClick={() => handleStepResult(index, 'PASS')}
+                onClick={() => handleStepResult(index, 'Pass')}
               >
                 Pass
               </Button>
               <Button
-                variant={stepResults[index].status === 'FAIL' ? 'contained' : 'outlined'}
+                variant={stepResults[index].status === 'Fail' ? 'contained' : 'outlined'}
                 color="error"
-                onClick={() => handleStepResult(index, 'FAIL')}
+                onClick={() => handleStepResult(index, 'Fail')}
               >
                 Fail
               </Button>
               <Button
-                variant={stepResults[index].status === 'BLOCKED' ? 'contained' : 'outlined'}
+                variant={stepResults[index].status === 'Blocked' ? 'contained' : 'outlined'}
                 color="warning"
-                onClick={() => handleStepResult(index, 'BLOCKED')}
+                onClick={() => handleStepResult(index, 'Blocked')}
               >
                 Blocked
               </Button>
