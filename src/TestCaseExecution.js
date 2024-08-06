@@ -98,9 +98,9 @@ const TestCaseExecution = () => {
     const hasFail = results.some(step => step.status === 'FAIL');
     const allPass = results.every(step => step.status === 'PASS');
   
-    if (hasBlocked) return 'BLOCKED';
     if (hasFail) return 'FAIL';
     if (allPass) return 'PASS';
+    if (hasBlocked) return 'BLOCKED';
     return 'UNEXECUTED'; // Default status if not all steps have been executed
   };
 
