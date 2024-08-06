@@ -81,8 +81,8 @@ const TestCaseExecution = () => {
       // Upload attachments
       if (attachments.length > 0) {
         const formData = new FormData();
-        attachments.forEach((file, index) => {
-          formData.append(`file${index}`, file);
+        attachments.forEach((file) => {
+          formData.append('file', file);  // Changed from 'file${index}' to 'file'
         });
         await uploadAttachments(createdExecution.id, formData);
       }
