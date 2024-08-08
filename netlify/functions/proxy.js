@@ -2,9 +2,9 @@ const axios = require('axios');
 const FormData = require('form-data');
 const API_BASE_URL = 'https://api.zephyrscale.smartbear.com/v2';
 const JIRA_API_URL = 'https://digital-solutions.atlassian.net/rest/api/2'; // Update this with your Jira URL
-const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0Ijp7ImJhc2VVcmwiOiJodHRwczovL2RpZ2l0YWwtc29sdXRpb25zLmF0bGFzc2lhbi5uZXQiLCJ1c2VyIjp7ImFjY291bnRJZCI6IjYzZDY0ZjQ5ZGI0ZjcxNWM5NzFlYmNhOCJ9fSwiaXNzIjoiY29tLmthbm9haC50ZXN0LW1hbmFnZXIiLCJzdWIiOiI0NjI1NDUyOC1kYjI4LTNiMTgtOGRkMi03ZGJjMmY2NWYzYjUiLCJleHAiOjE3NTI4MDQ0MjgsImlhdCI6MTcyMTI2ODQyOH0.AICGUijQnZLEfbpvd78f02PkEs8BP3hsKJLZ8R9vXFU';
-const JIRA_API_TOKEN = 'ATATT3xFfGF07rwyZ1kP7PKUFpyi_mQSugsAawQTclm1Qyk32mgjMBevkz3pN7iboCvCdW_3jIikdaAN2cAy-RUAM8sC0jsUlUVrlL0zjP19eVomTTc5yYt5vVwc8TIqj39bVlw0RwAjBbExvUcOiBN-Eg6kgX-_zxLUQmhg-TW4VdyzE1yWSbI=B3BCC61D';
-const JIRA_EMAIL = 'aananthanarayanan@bokf.com'
+const API_TOKEN = process.env.REACT_APP_API_TOKEN;
+const JIRA_API_TOKEN = process.env.REACT_APP_JIRA_API_TOKEN;
+const JIRA_EMAIL = REACT_APP_JIRA_EMAIL;
 
 exports.handler = async (event) => {
   const path = event.path.replace(/^\/api/, '');
