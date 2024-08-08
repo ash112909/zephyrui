@@ -1,15 +1,16 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0Ijp7ImJhc2VVcmwiOiJodHRwczovL2RpZ2l0YWwtc29sdXRpb25zLmF0bGFzc2lhbi5uZXQiLCJ1c2VyIjp7ImFjY291bnRJZCI6IjYzZDY0ZjQ5ZGI0ZjcxNWM5NzFlYmNhOCJ9fSwiaXNzIjoiY29tLmthbm9haC50ZXN0LW1hbmFnZXIiLCJzdWIiOiI0NjI1NDUyOC1kYjI4LTNiMTgtOGRkMi03ZGJjMmY2NWYzYjUiLCJleHAiOjE3NTI4MDQ0MjgsImlhdCI6MTcyMTI2ODQyOH0.AICGUijQnZLEfbpvd78f02PkEs8BP3hsKJLZ8R9vXFU`
-  }
+  baseURL: '/api'
 });
 
 api.interceptors.request.use(request => {
   console.log('Starting Request', JSON.stringify(request, null, 2));
+  if (request.url.startsWith('/jira/')) {
+    request.headers['Authorization'] = `Basic ${Buffer.from(`${process.env.REACT_APP_JIRA_EMAIL}:${process.env.REACT_APP_JIRA_API_TOKEN}`).toString('base64')}`;
+  } else {
+    request.headers['Authorization'] = `Bearer ${process.env.REACT_APP_API_TOKEN}`;
+  }
   return request;
 }, error => {
   console.error('Request error:', error);
