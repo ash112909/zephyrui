@@ -4,7 +4,7 @@ const API_BASE_URL = 'https://api.zephyrscale.smartbear.com/v2';
 const JIRA_API_URL = 'https://digital-solutions.atlassian.net/rest/api/2'; // Update this with your Jira URL
 const API_TOKEN = process.env.REACT_APP_API_TOKEN;
 const JIRA_API_TOKEN = process.env.REACT_APP_JIRA_API_TOKEN;
-const JIRA_EMAIL = REACT_APP_JIRA_EMAIL;
+const JIRA_EMAIL = process.env.REACT_APP_JIRA_EMAIL;
 
 exports.handler = async (event) => {
   const path = event.path.replace(/^\/api/, '');
