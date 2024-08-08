@@ -1,21 +1,19 @@
 import axios from 'axios';
 
-// Create an instance of axios with predefined base settings
 const api = axios.create({
-  baseURL: '/api', // Adjust this according to your server configuration
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}` // Using environment variable for security
+    'Authorization': `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjb250ZXh0Ijp7ImJhc2VVcmwiOiJodHRwczovL2RpZ2l0YWwtc29sdXRpb25zLmF0bGFzc2lhbi5uZXQiLCJ1c2VyIjp7ImFjY291bnRJZCI6IjYzZDY0ZjQ5ZGI0ZjcxNWM5NzFlYmNhOCJ9fSwiaXNzIjoiY29tLmthbm9haC50ZXN0LW1hbmFnZXIiLCJzdWIiOiI0NjI1NDUyOC1kYjI4LTNiMTgtOGRkMi03ZGJjMmY2NWYzYjUiLCJleHAiOjE3NTI4MDQ0MjgsImlhdCI6MTcyMTI2ODQyOH0.AICGUijQnZLEfbpvd78f02PkEs8BP3hsKJLZ8R9vXFU`
   }
 });
 
-// Request interceptor to log and handle requests uniformly
 api.interceptors.request.use(request => {
-    console.log('Starting Request', JSON.stringify(request, null, 2))
-    return request;
+  console.log('Starting Request', JSON.stringify(request, null, 2));
+  return request;
 }, error => {
-    console.error('Request error:', error);
-    return Promise.reject(error);
+  console.error('Request error:', error);
+  return Promise.reject(error);
 });
 
 export const getTestCase = async (testCaseKey) => {
@@ -67,5 +65,15 @@ export const updateExecutionStatus = async (testExecutionId, status) => {
   } catch (error) {
     console.error('Error updating test execution status:', error);
     throw new Error('Failed to update test execution status due to server error');
+  }
+};
+
+export const createJiraBug = async (bugData) => {
+  try {
+    const response = await api.post('/jira/issue', bugData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating Jira bug:', error);
+    throw new Error('Failed to create Jira bug due to server error');
   }
 };

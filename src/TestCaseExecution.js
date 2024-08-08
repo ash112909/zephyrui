@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import {
   Container, TextField, Button, Card, Typography, CircularProgress, AppBar, Toolbar, 
-  IconButton, Box, Modal, Fade
+  IconButton, Box, Modal, Fade, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
-import { getTestCase, createTestExecution, updateTestExecutionSteps, updateExecutionStatus } from './api';
+import { getTestCase, createTestExecution, updateTestExecutionSteps, updateExecutionStatus, createJiraBug } from './api';
+import JiraBugForm from './JiraBugForm';
 
 const TestCaseExecution = () => {
   const [testCaseKey, setTestCaseKey] = useState('');
@@ -21,6 +22,11 @@ const TestCaseExecution = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [enlargedImageUrl, setEnlargedImageUrl] = useState('');
   const [overallStatus, setOverallStatus] = useState('UNEXECUTED');
+  const [jiraBugModalOpen, setJiraBugModalOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [currentStepIndex, setCurrentStepIndex] = useState(null);
+  const [jiraBugLoading, setJiraBugLoading] = useState(false);
+  const [jiraBugError, setJiraBugError] = useState('');
 
   const handleFetchTestCase = async () => {
     setLoading(true);
@@ -56,6 +62,11 @@ const TestCaseExecution = () => {
       const newOverallStatus = determineOverallStatus(newResults);
       setOverallStatus(newOverallStatus);
       console.log('New overall status:', newOverallStatus);
+      
+      if (status === 'FAIL' || status === 'BLOCKED') {
+        setCurrentStepIndex(index);
+        setConfirmDialogOpen(true);
+      }
       
       return newResults;
     });
@@ -119,6 +130,36 @@ const TestCaseExecution = () => {
 
   const handleCloseModal = () => {
     setModalOpen(false);
+  };
+
+  const handleConfirmDialog = (confirm) => {
+    setConfirmDialogOpen(false);
+    if (confirm) {
+      setJiraBugModalOpen(true);
+    }
+  };
+
+  const handleJiraBugSubmit = async (bugData) => {
+    setJiraBugLoading(true);
+    setJiraBugError('');
+    try {
+      const step = stepResults[currentStepIndex];
+      const bugPayload = {
+        ...bugData,
+        testCaseKey,
+        stepDescription: step.description,
+        expectedResult: step.expectedResult,
+        actualResult: step.actualResult
+      };
+      await createJiraBug(bugPayload);
+      alert('Jira bug created successfully!');
+      setJiraBugModalOpen(false);
+    } catch (error) {
+      console.error('Error creating Jira bug:', error);
+      setJiraBugError('Error creating Jira bug. Please try again.');
+    } finally {
+      setJiraBugLoading(false);
+    }
   };
 
   const renderInlineContent = (content) => {
@@ -261,6 +302,30 @@ const TestCaseExecution = () => {
           </Box>
         </Fade>
       </Modal>
+
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+      >
+        <DialogTitle>Log Jira Bug</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Would you like to log a Jira bug for this issue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleConfirmDialog(false)}>No</Button>
+          <Button onClick={() => handleConfirmDialog(true)} autoFocus>Yes</Button>
+        </DialogActions>
+      </Dialog>
+
+      <JiraBugForm
+        open={jiraBugModalOpen}
+        onClose={() => setJiraBugModalOpen(false)}
+        onSubmit={handleJiraBugSubmit}
+        loading={jiraBugLoading}
+        error={jiraBugError}
+      />
     </Container>
   );
 };
