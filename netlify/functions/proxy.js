@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   try {
     let headers = {
       'Authorization': path.startsWith('/jira/') 
-        ? `Basic ${Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
+        ? `Basic ${btoa(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
         : `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json'
     };
