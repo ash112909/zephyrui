@@ -74,6 +74,6 @@ export const createJiraBug = async (bugData) => {
     return response.data;
   } catch (error) {
     console.error('Error creating Jira bug:', error);
-    throw new Error('Failed to create Jira bug due to server error');
+    throw error;
   }
 };

@@ -149,7 +149,8 @@ const TestCaseExecution = () => {
         testCaseKey,
         stepDescription: step.description,
         expectedResult: step.expectedResult,
-        actualResult: step.actualResult
+        actualResult: step.actualResult,
+        projectKey: projectKey
       };
       await createJiraBug(bugPayload);
       alert('Jira bug created successfully!');
