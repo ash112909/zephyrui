@@ -11,12 +11,23 @@ exports.handler = async (event) => {
   const url = path.startsWith('/jira/') ? `${JIRA_API_URL}${path.replace('/jira', '')}` : `${API_BASE_URL}${path}`;
 
   try {
-    const headers = {
-      'Authorization': path.startsWith('/jira/') 
-        ? `Basic ${Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
-        : `Bearer ${API_TOKEN}`,
+    let headers = {
       'Content-Type': 'application/json'
     };
+
+    // Pass through the Authorization header from the client
+    if (event.headers['Authorization']) {
+      headers['Authorization'] = event.headers['Authorization'];
+    }
+
+    // Only set the Authorization header if it wasn't provided by the client
+    if (!headers['Authorization']) {
+      headers['Authorization'] = path.startsWith('/jira/') 
+        ? `Basic ${Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
+        : `Bearer ${API_TOKEN}`;
+    }
+
+    let data;
 
     if (event.headers['content-type'] && event.headers['content-type'].includes('multipart/form-data')) {
       const form = new FormData();
