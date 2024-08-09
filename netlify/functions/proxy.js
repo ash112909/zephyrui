@@ -11,13 +11,12 @@ exports.handler = async (event) => {
   const url = path.startsWith('/jira/') ? `${JIRA_API_URL}${path.replace('/jira', '')}` : `${API_BASE_URL}${path}`;
 
   try {
-    let headers = {
+    const headers = {
       'Authorization': path.startsWith('/jira/') 
         ? `Basic ${Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
         : `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json'
     };
-    let data;
 
     if (event.headers['content-type'] && event.headers['content-type'].includes('multipart/form-data')) {
       const form = new FormData();
