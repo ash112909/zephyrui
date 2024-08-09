@@ -8,12 +8,12 @@ const JIRA_EMAIL = process.env.REACT_APP_JIRA_EMAIL;
 
 exports.handler = async (event) => {
   const path = event.path.replace(/^\/api/, '');
-  const url = path.startsWith('/jira/') ? `${JIRA_API_URL}${path.substring(5)}` : `${API_BASE_URL}${path}`;
+  const url = path.startsWith('/jira/') ? `${JIRA_API_URL}${path.replace('/jira', '')}` : `${API_BASE_URL}${path}`;
 
   try {
     let headers = {
       'Authorization': path.startsWith('/jira/') 
-        ? `Basic ${btoa(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
+        ? `Basic ${Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}` 
         : `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json'
     };
@@ -43,7 +43,8 @@ exports.handler = async (event) => {
           resolve();
         });
 
-        event.body.pipe(bb);
+        bb.write(event.body);
+        bb.end();
       });
     } else {
       data = event.body ? JSON.parse(event.body) : undefined;

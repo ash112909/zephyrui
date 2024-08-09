@@ -144,7 +144,7 @@ const TestCaseExecution = () => {
     setJiraBugError('');
     try {
       const step = stepResults[currentStepIndex];
-      const bugPayload = {
+      const fullBugData = {
         ...bugData,
         testCaseKey,
         stepDescription: step.description,
@@ -152,7 +152,7 @@ const TestCaseExecution = () => {
         actualResult: step.actualResult,
         projectKey: projectKey
       };
-      await createJiraBug(bugPayload);
+      await createJiraBug(fullBugData);
       alert('Jira bug created successfully!');
       setJiraBugModalOpen(false);
     } catch (error) {

@@ -71,10 +71,39 @@ export const updateExecutionStatus = async (testExecutionId, status) => {
 
 export const createJiraBug = async (bugData) => {
   try {
-    const response = await api.post('/jira/issue', bugData);
+    const payload = {
+      fields: {
+        project: {
+          key: bugData.projectKey
+        },
+        summary: bugData.summary,
+        issuetype: {
+          name: bugData.issueType
+        },
+        description: createDescription(bugData),
+        priority: {
+          name: bugData.priority
+        }
+      }
+    };
+    
+    console.log('Jira bug creation payload:', JSON.stringify(payload, null, 2));
+    
+    const response = await api.post('/jira/issue', payload);
     return response.data;
   } catch (error) {
     console.error('Error creating Jira bug:', error);
     throw error;
   }
 };
+
+function createDescription(bugData) {
+  return `
+Test Case Key: ${bugData.testCaseKey}
+Step Description: ${bugData.stepDescription}
+Expected Result: ${bugData.expectedResult}
+Actual Result: ${bugData.actualResult}
+
+${bugData.description}
+  `.trim();
+}
