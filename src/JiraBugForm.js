@@ -65,7 +65,6 @@ const JiraBugForm = ({ open, onClose, onSubmit, loading, error }) => {
             <MenuItem value="High">High</MenuItem>
             <MenuItem value="Medium">Medium</MenuItem>
             <MenuItem value="Low">Low</MenuItem>
-            <MenuItem value="Lowest">
             <MenuItem value="Lowest">Lowest</MenuItem>
           </Select>
         </FormControl>
