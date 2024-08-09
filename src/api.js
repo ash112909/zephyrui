@@ -7,7 +7,7 @@ const api = axios.create({
 api.interceptors.request.use(request => {
   console.log('Starting Request', JSON.stringify(request, null, 2));
   if (request.url.startsWith('/jira/')) {
-    request.headers['Authorization'] = `Basic ${btoa(`${process.env.REACT_APP_JIRA_EMAIL}:${process.env.REACT_APP_JIRA_API_TOKEN}`).toString('base64')}`;
+    request.headers['Authorization'] = `Basic ${btoa(`${process.env.REACT_APP_JIRA_EMAIL}:${process.env.REACT_APP_JIRA_API_TOKEN}`)}`;
   } else {
     request.headers['Authorization'] = `Bearer ${process.env.REACT_APP_API_TOKEN}`;
   }
